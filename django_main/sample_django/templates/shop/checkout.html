@@ -1,0 +1,164 @@
+{% extends 'shop/layouts/main.html' %}
+{% block title %}
+Checkout | ShopKart
+{% endblock title %}
+{% block content %}
+
+{% include 'shop/inc/messages.html' %}
+
+<div class="container">
+    <section class="bg-light py-4 my-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-3">Checkout</h4>
+                    <hr style="border-color:#b8bfc2;">
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Customer Information & Shipping</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="customer_name" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                               value="{{ customer_name|default:'' }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="customer_email" class="form-label">Email Address *</label>
+                                        <input type="email" class="form-control" id="customer_email" name="customer_email" 
+                                               value="{{ customer_email|default:'' }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="customer_contact" class="form-label">Contact Number *</label>
+                                        <input type="number" class="form-control" id="customer_contact" name="customer_contact" 
+                                               value="{{ customer_contact|default:'' }}"
+                                               pattern="[0-9]{10}"
+                                               title="Contact number must be exactly 10 digits"
+                                               maxlength="10" required>
+                                        <div class="form-text">Must be exactly 10 digits</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="payment_method" class="form-label">Payment Method *</label>
+                                        <select class="form-select" id="payment_method" name="payment_method" required>
+                                            {% for value, display in payment_methods %}
+                                            <option value="{{ value }}">{{ display }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="shipping_address" class="form-label">Shipping Address *</label>
+                                    <textarea class="form-control" id="shipping_address" name="shipping_address" rows="4" required 
+                                    pattern="^(?=.*[,.\-/#@&()])[A-Za-z0-9\s,.\-/#@&()]+$"
+                                    title="Shipping address must contain at least one special character: , . - / # @ & ( )"></textarea>
+                                    <div class="form-text">Must include at least one special character: , . - / # @ & ( )</div>
+                                </div>
+                                
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const shippingAddress = document.getElementById('shipping_address');
+                                    const customerContact = document.getElementById('customer_contact');
+                                    const form = shippingAddress.closest('form');
+                                    
+                                    // Shipping address validation
+                                    shippingAddress.addEventListener('input', function() {
+                                        const hasSpecialChar = /[,.\-/#@&()]/.test(this.value);
+                                        if (hasSpecialChar) {
+                                            this.setCustomValidity('');
+                                        } else {
+                                            this.setCustomValidity('Shipping address must contain at least one special character: , . - / # @ & ( )');
+                                        }
+                                    });
+                                    
+                                    // Contact number validation
+                                    customerContact.addEventListener('input', function() {
+                                        const isValidContact = /^[0-9]{10}$/.test(this.value);
+                                        if (isValidContact) {
+                                            this.setCustomValidity('');
+                                        } else {
+                                            this.setCustomValidity('Contact number must be exactly 10 digits');
+                                        }
+                                    });
+                                    
+                                    form.addEventListener('submit', function(e) {
+                                        const hasSpecialChar = /[,.\-/#@&()]/.test(shippingAddress.value);
+                                        const isValidContact = /^[0-9]{10}$/.test(customerContact.value);
+                                        
+                                        if (!hasSpecialChar) {
+                                            e.preventDefault();
+                                            shippingAddress.setCustomValidity('Shipping address must contain at least one special character: , . - / # @ & ( )');
+                                            shippingAddress.reportValidity();
+                                        } else if (!isValidContact) {
+                                            e.preventDefault();
+                                            customerContact.setCustomValidity('Contact number must be exactly 10 digits');
+                                            customerContact.reportValidity();
+                                        }
+                                    });
+                                });
+                                </script>
+                                
+                                {% if is_buy_now %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="{{ quantity }}">
+                                <input type="hidden" name="buy_now" value="true">
+                                {% endif %}
+                                
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-credit-card"></i> Place Order
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if is_buy_now %}
+                                <div class="d-flex justify-content-between">
+                            <img src="{{product.product_image.url}}" class="card-image-top" alt="{{product.name}}">
+                                  </div>  
+                                    <span>{{ product.name }}</span>
+                                    <span>₹{{ product.selling }} x {{ quantity }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <strong>Total:</strong>
+                                    <strong>₹{{ total_amount }}</strong>
+                                </div>
+                            {% else %}
+                                {% for item in cart_items %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>{{ item.product.name }}</span>
+                                    <span>₹{{ item.product.selling }} x {{ item.quantity }}</span>
+                                </div>
+                                {% endfor %}
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <strong>Total:</strong>
+                                    <strong>₹{{ total_amount }}</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock content %}

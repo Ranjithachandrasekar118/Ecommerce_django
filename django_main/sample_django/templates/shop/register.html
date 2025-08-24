@@ -1,0 +1,130 @@
+{% extends 'shop/layouts/main.html' %}
+{% block title %}
+   Registration | ShopKart
+{% endblock title %}   
+{% block content %}
+
+   
+
+
+
+    <div class="container" style="margin-top:70px;min-height:600px;">
+     <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3">Register Page</h4>
+            <hr style="border-color:#b8bfc2;">
+            {% include 'shop/inc/messages.html' %}
+
+       
+        </div>
+     </div>
+     <section class="py-4 my-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-6">
+                    <form method="post" action="{% url 'reg' %}">
+                        {% csrf_token %} 
+                        <!-- <input type="text" name="username" placeholder="Enter Your Name" required><br>
+                        <input type="email" name="email" placeholder="Enter Your Email" required><br>
+                        <input type="password" name="password" placeholder="Enter Your Password" required><br>
+                        <input type="password" name="confirm_password" placeholder="Confirm Your Password" required>
+                        <button type="submit">Register</button>"  -->
+                           <div class="mb-4"> 
+                            <label for="" class="form-label">User Name</label>
+                          {{form.username}}
+                          {% if form.username %}
+                          <label class="text-danger">{{ form.errors.username }}</label>
+                          {% endif %}
+                           
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="form-label">User Email</label>
+
+                          {{form.email}}
+                          {% if form.email %}
+                          <label class="text-danger">{{ form.errors.email }}</label>
+                          {% endif %}
+                           
+                        </div>
+                        <div class="mb-4"> 
+                            <label for="" class="form-label">User Password</label>
+                            {{form.password1}}
+                            {% if form.password1 %}
+                          <label class="text-danger">{{ form.errors.password1 }}</label>
+                           {% endif %}
+                           
+                        </div>  
+                        <div class="mb-4">
+                            <label for="" class="form-label">User Confirmpassword</label>
+
+                          {{form.password2}}
+                          {% if form.password2 %}
+                          <label class="text-danger">{{ form.errors.password2 }}</label>
+                          {% endif %}
+                           
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="form-label">Contact Number</label>
+                            {{form.contact_number}}
+                            <!-- <input type="text" name="contact_number" class="form-control" placeholder="Enter Contact Number" required> -->
+                            {% if form.contact_number %}
+                            <label class="text-danger">{{ form.errors.contact_number }}</label>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        
+                    </form>
+                    <p class="my-2">Already user ? <a href="{% url 'login' %}">Login Now</a></p>
+                </div>
+            </div>
+        </div>
+     </section> 
+    </div> 
+{% endblock content %}
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form method="POST">
+        {%csrf_token%}
+        <input type="text" name="username" placeholder="userName" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <!-- <input type="number" name="age" placeholder="Age" required><br> -->
+     
+
+        <!-- <input type="password" name="password" placeholder="Password" required><br> -->
+        <!-- <input type="password" name="confirmpassword" placeholder="Confirmpassword" required><br> -->
+        <!-- <button type="submit">submit</button>  -->
+
+    <!-- </form> -->
+    
+<!-- </body> -->
+<!-- </html>  -->

@@ -1,0 +1,78 @@
+{% extends 'shop/layouts/main.html' %}
+{% block title %}
+Order Confirmation | ShopKart
+{% endblock title %}
+{% block content %}
+
+{% include 'shop/inc/messages.html' %}
+
+<div class="container">
+    <section class="bg-light py-4 my-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-3">Order Confirmation</h4>
+                    <hr style="border-color:#b8bfc2;">
+                </div>
+                
+                <div class="col-12 text-center">
+                    <div class="alert alert-success">
+                        <h4><i class="fa fa-check-circle"></i> Order Placed Successfully!</h4>
+                        <p>Thank you for your purchase. Your order has been received and is being processed.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Order Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Order Number: {{ order.order_number }}</h6>
+                            <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+                            <p><strong>Status:</strong> {{ order.status|title }}</p>
+                            <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+                            <p><strong>Order Date:</strong> {{ order.created_at|date:"d M Y H:i" }}</p>
+                            
+                            <h6 class="mt-4">Order Items:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order_items %}
+                                        <tr>
+                                            <td>{{ item.product.name }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>₹{{ item.price }}</td>
+                                            <td>₹{{ item.price|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'my_orders' %}" class="btn btn-primary">
+                            <i class="fa fa-list"></i> View My Orders
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-secondary ms-2">
+                            <i class="fa fa-home"></i> Continue Shopping
+                        </a>
+                        <a href="{% url 'order_feedback' order.id %}" class="btn btn-success ms-2">
+                            <i class="fa fa-comment"></i> Leave Feedback
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock content %}

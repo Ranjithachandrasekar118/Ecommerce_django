@@ -1,0 +1,98 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block title %}Admin Feedback - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Customer Feedback Management</h2>
+            
+            {% if unread_count > 0 %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> You have {{ unread_count }} unread feedback message{{ unread_count|pluralize }}.
+            </div>
+            {% endif %}
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">All Feedback</h5>
+                </div>
+                <div class="card-body">
+                    {% if feedback_list %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Rating</th>
+                                    <th>Product</th>
+                                    <th>Order</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feedback in feedback_list %}
+                                <tr class="{% if not feedback.is_read %}table-light{% endif %}">
+                                    <td>{{ feedback.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>{{ feedback.name }}</td>
+                                    <td>{{ feedback.email }}</td>
+                                    <td>{{ feedback.subject }}</td>
+                                    <td>
+                                        {% for i in "12345" %}
+                                            <i class="fas fa-star {% if i <= feedback.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if feedback.product %}
+                                            <a href="{% url 'product_details' feedback.product.category.name feedback.product.name %}">{{ feedback.product.name }}</a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if feedback.order %}
+                                            {{ feedback.order.order_number }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if feedback.is_read %}
+                                            <span class="badge bg-success">Read</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Unread</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'mark_feedback_read' feedback.id %}" class="btn btn-sm btn-outline-primary">
+                                            {% if feedback.is_read %}Mark Unread{% else %}Mark Read{% endif %}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9">
+                                        <strong>Message:</strong> {{ feedback.message|linebreaks }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No feedback received yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

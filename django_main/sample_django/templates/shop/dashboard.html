@@ -1,0 +1,163 @@
+{% extends 'shop/layouts/main.html' %}
+{% block title %}
+User Dashboard | ShopKart
+{% endblock title %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Dashboard</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action active" id="profile-tab">
+                            <i class="fa fa-user"></i> Profile
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="settings-tab">
+                            <i class="fa fa-cog"></i> Settings
+                        </a>
+                        <!-- <a href="{% url 'my_orders' %}" class="list-group-item list-group-item-action" id="orders-tab"> -->
+                            <!-- <i class="fa fa-shopping-bag"></i> My Orders -->
+                        </a>
+                        <a href="{% url 'cart' %}" class="list-group-item list-group-item-action" id="cart-tab">
+                            <i class="fa fa-shopping-cart"></i> My Cart
+                        </a>
+                        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                            <i class="fa fa-sign-out"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <!-- Profile Section -->
+                <div class="card" id="profile-section">
+                    <div class="card-header">
+                        <h4>User Profile</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Profile">
+                                <h5>{{ request.user.get_full_name|default:request.user.username }}</h5>
+                                <p class="text-muted">{{ request.user.email }}</p>
+                                <p class="text-muted"><strong>Contact:</strong> {{ request.user.userprofile.contact_number|default:"Not provided" }}</p>
+                            </div>
+                            <div class="col-md-8">
+                                <form method="POST" action="{% url 'update_profile' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" value="{{ request.user.username }}" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <!-- <label class="form-label">First Name</label> -->
+                                        <!-- <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}"> -->
+                                    </div>
+                                    <div class="mb-3">
+                                        <!-- <label class="form-label">Last Name</label> -->
+                                        <!-- <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}"> -->
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Contact Number</label>
+                                        <input type="text" name="contact_number" class="form-control" value="{{ request.user.userprofile.contact_number|default:'' }}">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="card d-none" id="settings-section">
+                    <div class="card-header">
+                        <h4>Account Settings</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{% url 'change_password' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" name="old_password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <!-- <label class="form-label">New Password</label> -->
+                                <!-- <input type="password" name="new_password1" class="form-control" required> -->
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" name="new_password2" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Orders Section -->
+                <!-- <div class="card d-none" id="orders-section"> -->
+                    <!-- <div class="card-header"> -->
+                        <!-- <h4>My Orders</h4> -->
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Your order history will appear here.</p>
+                    </div>
+                </div>
+
+                <!-- Cart Section -->
+                <div class="card d-none" id="cart-section">
+                    <div class="card-header">
+                        <h4>My Shopping Cart</h4>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'cart' %}" class="btn btn-primary">View Full Cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = {
+        'profile-tab': 'profile-section',
+        'settings-tab': 'settings-section',
+        'orders-tab': 'orders-section',
+        'cart-tab': 'cart-section'
+    };
+
+    Object.keys(tabs).forEach(tabId => {
+        document.getElementById(tabId).addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Hide all sections
+            Object.values(tabs).forEach(sectionId => {
+                document.getElementById(sectionId).classList.add('d-none');
+            });
+            
+            // Remove active class from all tabs
+            Object.keys(tabs).forEach(t => {
+                document.getElementById(t).classList.remove('active');
+            });
+            
+            // Show selected section
+            const sectionId = tabs[tabId];
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock content %}

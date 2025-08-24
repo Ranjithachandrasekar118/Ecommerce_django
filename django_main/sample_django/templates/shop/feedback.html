@@ -1,0 +1,105 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block title %}Feedback - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Customer Feedback</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">We value your feedback! Please share your thoughts with us.</p>
+                    
+                    <form method="post" action="{% if order %}{% url 'order_feedback' order.id %}{% else %}{% url 'feedback' %}{% endif %}">
+                        {% csrf_token %}
+                        
+                        {% if order %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> You're leaving feedback for <strong>Order #{{ order.order_number }}</strong>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Your Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject *</label>
+                            <input type="text" class="form-control" id="subject" name="subject" 
+                                   value="{% if order %}Feedback for Order #{{ order.order_number }}{% endif %}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Rating</label>
+                            <select class="form-select" id="rating" name="rating">
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                        <div class="mb-3">
+                            <!-- <label for="product_id" class="form-label">Related Product (Optional)</label> -->
+                            <!-- <select class="form-select" id="product_id" name="product_id"> -->
+                                <!-- <option value="">-- Select Product --</option> -->
+                                {% if order %}
+                                    {% for item in order.OrderItem_set.all %}
+                                    <option value="{{ item.product.id }}">{{ item.product.name }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for product in products %}
+                                    <option value="{{ product.id }}">{{ product.name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="order_id" class="form-label">Related Order (Optional)</label>
+                            <select class="form-select" id="order_id" name="order_id" {% if order %}disabled{% endif %}>
+                                {% if order %}
+                                    <option value="{{ order.id }}" selected>Order #{{ order.order_number }}</option>
+                                {% else %}
+                                    <!-- <option value="">-- Select Order --</option> -->
+                                    {% for order in user_orders %}
+                                    <option value="{{ order.id }}">Order #{{ order.order_number }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            {% if order %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Feedback
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
